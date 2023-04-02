@@ -1,0 +1,13 @@
+{% extends "index.html" %}
+{% block content %}
+    <h1> {% block title %} Movies {% endblock %} </h1>
+    {% for m in movies %}
+        <h3>{{m.name }} by {{ m.director}}</h3>
+        <i>Genre: {{m.genre}}</i>
+        <p> {{ m.synopsis }}</p>
+        <p>Release date: {{m.released}}</p>
+        <p>IMDb: {{m.rating}}</p>
+        <i>Added by: {{m.posted_by }}</i>
+        <p></p>
+    {% endfor %}
+{% endblock %}

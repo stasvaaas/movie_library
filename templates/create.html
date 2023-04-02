@@ -1,0 +1,46 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<h1> {% block title %} Add a movie {% endblock %}</h1>
+
+<form method="POST">
+    <p>
+        <label for="title">Title</label>
+        <input type="text" name="title" placeholder="Movie title">
+    </p>
+
+    <p>
+        <label for="genre">Genre</label>
+        <input type="text" name="genre" placeholder="Movie genre">
+    </p>
+
+    <p>
+        <label for="director">Director</label>
+        <input type="text" name="director" placeholder="Movie director">
+    </p>
+
+    <p>
+        <label for="released">Released</label>
+        <input type="date" name="released" placeholder="Movie release date">
+    </p>
+
+    <p>
+        <label for="synopsis">Synopsis</label>
+        <input type="text" name="synopsis" placeholder="Synopsis">
+    </p>
+
+    <p>
+        <label for="rating">Rating</label>
+        <input type="number" min="0" max="10" step="0.1" name="rating" placeholder="Movie rating">
+    </p>
+
+    <p>
+        <label for="poster">Poster</label>
+        <input type="file" name="poster" accept="image/png, image/jpeg">
+    </p>
+    <p>
+        <button type="submit">Submit</button>
+    </p>
+</form>
+
+{% endblock %}

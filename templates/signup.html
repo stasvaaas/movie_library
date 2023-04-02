@@ -1,0 +1,59 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+
+<div class="row align-items-center g-lg-5 py-5">
+    <div class="col-lg-7 text-center text-lg-start">
+        <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">Welcome to our movie library website!</h1>
+        <p class="d-flex justify-content-center">
+        <h2 class="font-weight-light">
+            Thank you for joining our movie-loving community. We hope you enjoy exploring our collection of films and
+            discovering new favorites.
+        </h2>
+        </p>
+    </div>
+    <div class="col-md-10 mx-auto col-lg-5">
+        <form method="POST" class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
+            <div class="form-floating mb-3">
+                <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                <!-- <label for="floatingInput">Email address</label> -->
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" name="username" class="form-control" id="floatingInput2" placeholder="Username">
+                <!--<label for="floatingPassword">Password</label>-->
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" name="password" class="form-control" id="floatingPassword"
+                       placeholder="Password">
+                <!--<label for="floatingPassword">Password</label>-->
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" name="password2" class="form-control" id="floatingPassword2"
+                       placeholder="Confirm password">
+                <!--<label for="floatingPassword">Password</label>-->
+
+            </div>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="alert alert-danger " role="alert">
+                {% for message in messages %}
+                {{ message }}
+                {% endfor %}
+            </div>
+
+            {% endif %}
+            {% endwith %}
+            <div class="checkbox mb-3">
+                <label>
+                    <input type="checkbox" value="remember-me"> Remember me
+                </label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+            <hr class="my-4">
+            <small class="text-body-secondary">By clicking Sign up, you agree to the terms of use.</small>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
