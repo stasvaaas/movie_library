@@ -6,32 +6,42 @@
     <title>{% block title %} {% endblock %}Movies library</title>
 </head>
 <body>
-<nav class="navbar navbar-expand navbar-dark bg-dark" aria-label="Second navbar example">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Movies library</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarsExample02">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="movies">All movies</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Genres</a>
-          </li>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">Movies library</a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/' %} active {% endif %}" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/movies' %} active {% endif %}" href="movies">All movies</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Genres</a>
+            </li>
             <li class="nav-item">
             <a class="nav-link" href="#">Directors</a>
           </li>
+          </ul>
+          <form class="form-inline my-2 my-md-0">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search">
+          </form>
+        <button class="btn btn-primary ml-3">Search</button>
+        <ul class="navbar-nav ml-auto">
+          {% if current_user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+          </li>
+          {% else %}
+          <li class="nav-item {% if request.path == '/login' %} active {% endif %}">
+            <a class="nav-link" href="login">Login</a>
+          </li>
+          {% endif %}
         </ul>
-        <form role="search">
-          <input class="form-control" type="search" aria-label="Search">
-        </form>
-          <button class="btn btn-primary ml-2">Search</button>
       </div>
     </div>
   </nav>
- {% block content %}{% endblock %}
+{% block content %}{% endblock %}
 </body>
 </html>
