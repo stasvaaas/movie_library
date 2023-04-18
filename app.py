@@ -1,12 +1,13 @@
 import os
 import psycopg2
-from flask import Markup
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_manager, current_user, login_required, logout_user, login_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask import render_template, request, url_for, redirect, flash, Flask, session
 from werkzeug.utils import secure_filename
-
+from sqlalchemy import Column, DateTime, text
+from flask import Markup, send_from_directory
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import render_template, request, url_for, redirect, flash, Flask
+from flask_login import LoginManager, UserMixin, current_user, login_required, logout_user, login_user
 
 UPLOAD_FOLDER = 'static/uploads'
 app = Flask(__name__)
@@ -44,9 +45,10 @@ class Movie(db.Model):
     poster = db.Column(db.String(255), nullable=False)
     posted_by = db.Column(db.String(100), db.ForeignKey('users.username'), nullable=False)
     movie_id = db.Column(db.Integer, nullable=False, primary_key=True)
+    created_at = Column(DateTime, default=datetime.utcnow, server_default=text('(now() at time zone \'utc\')'))
 
     def __repr__(self):
-        return f"<Movie id: {self.id}>"
+        return f"<Movie id: {self.movie_id}>"
 
 
 def get_db_connection():
@@ -64,17 +66,30 @@ def load_user(user_id):
 
 @app.route("/")
 def home():
-    return render_template('index.html')
+    flash('Your movie was added successfully!', category='success')
+    return render_template('index.html', )
+
+
+@app.route('/upload/<filename>')
+def send_image(filename):
+    return send_from_directory('static/uploads', filename)
 
 
 @app.route("/movies")
 def movies_all():
-    movies = Movie.query.all()
-    return render_template('movies.html', movies=movies)
+    page = request.args.get('page', 1, type=int)
+    movies = Movie.query.order_by(Movie.created_at.desc()).paginate(page=page, per_page=10)
+    image_names = os.listdir('static/uploads')
+    return render_template('movies.html', movies=movies, image_names=image_names)
 
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/create', methods=['GET', 'POST'])
@@ -95,17 +110,22 @@ def create():
             if file.filename == '':
                 flash('No selected file')
                 return redirect(request.url)
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                upload_folder = app.config['UPLOAD_FOLDER']
-                if not os.path.exists(upload_folder):
-                    os.makedirs(upload_folder)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                movie = Movie(title=title, genre=genre, director=director, released=released,
-                              synopsis=synopsis, rating=rating, poster=filename, posted_by=posted_by)
+            files = request.files.getlist('poster')
+            file_names = []
+            for file in files:
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file_names.append(filename)
+                    upload_folder = app.config['UPLOAD_FOLDER']
+                    if not os.path.exists(upload_folder):
+                        os.makedirs(upload_folder)
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+                    movie = Movie(title=title, genre=genre, director=director, released=released,
+                                  synopsis=synopsis, rating=rating, poster=filename, posted_by=posted_by)
                 db.session.add(movie)
                 db.session.commit()
-                return redirect(url_for('home', filename=filename))
+                return redirect(url_for('movies_all', movie=movie, filenames=file_names))
             else:
                 flash('Invalid poster file type. Please upload .png or .jpeg')
     else:
@@ -113,6 +133,38 @@ def create():
         # return redirect(url_for('login'))
     return render_template('create.html')
 
+
+def display_image(filename):
+    return redirect(url_for('static', filename='uploads/' + filename), code=301)
+
+
+# delete method
+# @app.route('/delete/<int:record_id>', methods=['POST'])
+# def delete_record(movie_id):
+#     # Find the record in the database and retrieve the associated image filename
+#     record = Movie.query.get(movie_id)
+#     if record is not None:
+#         filename = record.poster
+#
+#         # Delete the record from the database
+#         db.session.delete(record)
+#         db.session.commit()
+#
+#         # Remove the image file from the upload folder
+#         if filename:
+#             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+#             if os.path.exists(file_path):
+#                 os.remove(file_path)
+#                 flash('Image deleted successfully', 'success')
+#             else:
+#                 flash('Image file not found', 'error')
+#         else:
+#             flash('No image associated with the record', 'warning')
+#
+#         return redirect(url_for('movies_all'))
+#     else:
+#         flash('Record not found', 'error')
+#         return redirect(url_for('movies_all'))
 
 @app.route('/signup', methods=('POST', 'GET'))
 def signup():
@@ -161,7 +213,7 @@ def login():
             return redirect(url_for('login'))
         login_user(user, remember=remember)
         return redirect(url_for('home'))
-        #return redirect(request.form.get('next'))
+        # return redirect(request.form.get('next'))
     return render_template('login.html')
 
 

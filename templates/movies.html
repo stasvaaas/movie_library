@@ -1,13 +1,79 @@
 {% extends "index.html" %}
 {% block content %}
-    <h1> {% block title %} Movies {% endblock %} </h1>
-    {% for m in movies %}
-        <h3>{{m.name }} by {{ m.director}}</h3>
-        <i>Genre: {{m.genre}}</i>
-        <p> {{ m.synopsis }}</p>
-        <p>Release date: {{m.released}}</p>
-        <p>IMDb: {{m.rating}}</p>
-        <i>Added by: {{m.posted_by }}</i>
-        <p></p>
+<h1 class="row justify-content-center mt-3 mb-5"> {% block title %}  Movies {% endblock %} </h1>
+<div class="container">
+<div class="row justify-content-center">
+
+        {% for movie in movies %}
+        <div class="card mb-4 ml-3">
+            <div class="shadow-sm">
+                <div>
+                    {% for image in image_names %}
+                    {% if image == movie.poster %}
+                    <img src="{{url_for('send_image', filename=image) }}" class="card " style="width: 18rem;"
+                         width="220" height="326">
+                </div>
+                {% endif %}
+                {% endfor %}
+
+                <div class="card-body">
+                    <a class="font-weight-bold" >{{ movie.title }}</a>
+                    <p class="card-text"> by <a href="#" >{{ movie.director }}</a></p>
+                    <p class="card-text">{{ movie.genre }}</p>
+                    <p class="card-text">IMDb: {{movie.rating}}</p>
+                    <p></p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a href="#" type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                            {% if current_user.is_authenticated %}
+                            <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                            {% endif %}
+                        </div>
+                        <small class="text-body-secondary">Added by: {{movie.posted_by }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endfor %}
+
+
+</div>
+
+<!-- Pagination Links-->
+<div class="text-right">
+    <a href="{{ url_for('movies_all', page=movies.prev_num) }}"
+       class="btn btn-outline-dark
+       {% if movies.page == 1 %}disabled{% endif %}">
+        &laquo;
+    </a>
+<!-- Loop through the number of pages to display a link for each-->
+    {% for page_num in movies.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+{% if page_num %}
+<!-- Check for the active page and set the link to "Active"-->
+            {% if movies.page == page_num %}
+            <a href="{{ url_for('movies_all', page=page_num) }}"
+               class="btn btn-dark">
+                {{ page_num }}
+            </a>
+            {% else %}
+            <a href="{{ url_for('movies_all', page=page_num) }}"
+               class="btn btn-outline-dark">
+                {{ page_num }}
+            </a>
+            {% endif %}
+        {% else %}
+            ...
+        {% endif %}
     {% endfor %}
+    <a href="{{ url_for('movies_all', page=movies.next_num) }}"
+       class="btn btn-outline-dark
+       {% if movies.page == movies.pages %}disabled{% endif %}">
+        &raquo;
+    </a>
+</div>
+<p class="text-right mt-3">
+   Showing page {{ movies.page }} of {{ movies.pages }}
+</p>
+</div>
 {% endblock %}
