@@ -11,61 +11,61 @@
             {% endif %}
         {% endwith %}
 <div class="col-md-10 mx-auto col-lg-5 text-center">
-        <h1 class="display-4 lh-1 text-body-emphasis mb-3">Welcome to our website!</h1>
+        <h1 class="display-4 lh-1 text-body-emphasis mb-3">You are updating a "{{ movie.title }}" movie.</h1>
         <p class="d-flex justify-content-center">
         <h2 class="font-weight-light mx-3 mb-4">
-            Add movies easily with just a few clicks. Upload movie posters, provide details about the movie, and let others discover and enjoy your favorite films.
+            Please update the details of the movie below:
         </h2>
     </div>
 <div class="col-md-10 mx-auto col-lg-5">
-    <form enctype="multipart/form-data" action="/create" class="p-4 p-md-5 border rounded-3 bg-body-tertiary mr-4 pr-4" method="POST">
+    <form action="{{ url_for('edit_movie', id=movie.movie_id) }}" enctype="multipart/form-data" class="p-4 p-md-5 border rounded-3 bg-body-tertiary mr-4 pr-4" method="POST">
     <p>
 
         <div class="col 12">
               <label class="form-label">Title</label>
-              <input type="text" class="form-control" name="title" placeholder="Movie title" value="" required="true">
+              <input type="text" class="form-control" name="title" placeholder="Movie title" value="{{ movie.title }}">
             </div>
     </p>
 
     <p>
          <div class="col 12">
               <label  class="form-label">Genre</label>
-              <input type="text" class="form-control" name="genre" placeholder="Movie genre" required="true">
+              <input type="text" class="form-control" name="genre" placeholder="Movie genre" value="{{ movie.genre }}">
             </div>
     </p>
 
     <p>
         <div class="col 12">
               <label  class="form-label">Director</label>
-              <input type="text" class="form-control" name="director" placeholder="Movie director" required="true">
+              <input type="text" class="form-control" name="director" placeholder="Movie director" value="{{ movie.director }}">
             </div>
     </p>
 
     <p>
         <div class="col 12">
               <label  class="form-label">Released</label>
-              <input type="date" class="form-control" name="released" placeholder="" required="true">
+              <input type="date" class="form-control" name="released" placeholder="" value="{{ movie.released }}">
             </div>
     </p>
 
     <p>
         <div class="col 12">
   <label class="form-label">Synopsis</label>
-  <textarea class="form-control" name="synopsis" rows="3"></textarea>
+  <textarea class="form-control" name="synopsis" rows="3"> {{ movie.synopsis }}</textarea>
 </div>
     </p>
 
     <p>
         <div class="col 12">
               <label  class="form-label">Rating</label>
-              <input type="number" class="form-control" type="number" min="0" max="10" step="0.1" name="rating" placeholder="Movie rating"required="true">
+              <input type="number" class="form-control" type="number" min="0" max="10" step="0.1" name="rating" placeholder="Movie rating" value="{{ movie.rating }}">
             </div>
     </p>
 
     <p>
         <div class="col 12">
             <label class="form-label">Poster</label>
-                <input class="form-control" type="file" name="poster" accept="image/png, image/jpeg">
+                <input class="form-control" type="file" name="poster" accept="image/png, image/jpeg" value=" {{ movie.poster }}">
         </div>
     </p>
     <p>

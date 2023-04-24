@@ -83,6 +83,62 @@ def movies_all():
     return render_template('movies.html', movies=movies, image_names=image_names)
 
 
+@app.route('/movies/<int:id>')
+def moviepage(id):
+    movie = Movie.query.get(id)
+    image_names = os.listdir('static/uploads')
+    return render_template('movie.html', movie=movie, image_names=image_names)
+
+
+@app.route('/movies/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_movie(id):
+    movie = Movie.query.get(id)
+    if request.method == 'POST':
+        title = request.form['title']
+        genre = request.form['genre']
+        director = request.form['director']
+        released = request.form['released']
+        synopsis = request.form['synopsis']
+        rating = request.form['rating']
+        file = request.files['poster']
+        filename = secure_filename(file.filename)
+        movie.poster = filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+
+        movie.title = title
+        movie.genre = genre
+        movie.director = director
+        movie.released = released
+        movie.synopsis = synopsis
+        movie.rating = rating
+        movie.poster = filename
+
+        db.session.commit()
+        flash('Your movie was updated successfully!')
+        return redirect(url_for('moviepage', id=id))
+    return render_template('edit.html', movie=movie)
+
+
+@app.route('/movies/<int:id>/delete', methods=['POST'])
+@login_required
+def delete_movie(id):
+    movie_to_delete = Movie.query.get(id)
+    if movie_to_delete is not None:
+        filename = movie_to_delete.poster
+    if movie_to_delete:
+        db.session.delete(movie_to_delete)
+        db.session.commit()
+        poster_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        os.remove(poster_path)
+        flash('Movie deleted successfully!', 'success')
+    else:
+        flash('Movie not found!', 'error')
+
+    return redirect(url_for('movies_all'))
+
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
@@ -125,6 +181,7 @@ def create():
                                   synopsis=synopsis, rating=rating, poster=filename, posted_by=posted_by)
                 db.session.add(movie)
                 db.session.commit()
+                flash('Your movie was added successfully', category='success')
                 return redirect(url_for('movies_all', movie=movie, filenames=file_names))
             else:
                 flash('Invalid poster file type. Please upload .png or .jpeg')
@@ -138,7 +195,7 @@ def display_image(filename):
     return redirect(url_for('static', filename='uploads/' + filename), code=301)
 
 
-# delete method
+# delete image from folder method
 # @app.route('/delete/<int:record_id>', methods=['POST'])
 # def delete_record(movie_id):
 #     # Find the record in the database and retrieve the associated image filename
