@@ -45,7 +45,7 @@ class Movie(db.Model):
     poster = db.Column(db.String(255), nullable=False)
     posted_by = db.Column(db.String(100), db.ForeignKey('users.username'), nullable=False)
     movie_id = db.Column(db.Integer, nullable=False, primary_key=True)
-    created_at = Column(DateTime, default=datetime.utcnow, server_default=text('(now() at time zone \'utc\')'))
+    created_at = Column(db.DateTime, default=datetime.utcnow, server_default=text('(now() at time zone \'utc\')'))
 
     def __repr__(self):
         return f"<Movie id: {self.movie_id}>"
@@ -64,7 +64,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@app.route("/")
+@app.route('/')
 def home():
     flash('Your movie was added successfully!', category='success')
     return render_template('index.html', )
@@ -75,13 +75,42 @@ def send_image(filename):
     return send_from_directory('static/uploads', filename)
 
 
-@app.route("/movies")
+@app.route('/movies')
 def movies_all():
     page = request.args.get('page', 1, type=int)
     movies = Movie.query.order_by(Movie.created_at.desc()).paginate(page=page, per_page=10)
     image_names = os.listdir('static/uploads')
     return render_template('movies.html', movies=movies, image_names=image_names)
 
+
+@app.route('/directors')
+def directors():
+    directors = Movie.query.distinct(Movie.director).all()
+    directors_names = [director.director for director in directors]
+    return render_template('directors.html', directors=directors_names)
+
+
+@app.route('/movies/director/<director_name>')
+def movie_by_director(director_name):
+    movies = Movie.query.filter_by(director=director_name).all()
+    director = director_name
+    image_names = os.listdir('static/uploads')
+    return render_template('movies_by_director.html', movies=movies, director=director, image_names=image_names)
+
+
+@app.route('/genres')
+def genres():
+    all_genres = Movie.query.distinct(Movie.genre).all()
+
+    return render_template('genres.html', genres=all_genres)
+
+
+@app.route('/<genre>/movies')
+def movies_by_genre(genre):
+    movies = Movie.query.filter_by(genre=genre).all()
+    genre_name = genre
+    image_names = os.listdir('static/uploads')
+    return render_template('movies_by_genre.html', movies=movies, genre=genre_name, image_names=image_names)
 
 @app.route('/movies/<int:id>')
 def moviepage(id):
@@ -95,26 +124,17 @@ def moviepage(id):
 def edit_movie(id):
     movie = Movie.query.get(id)
     if request.method == 'POST':
-        title = request.form['title']
-        genre = request.form['genre']
-        director = request.form['director']
-        released = request.form['released']
-        synopsis = request.form['synopsis']
-        rating = request.form['rating']
         file = request.files['poster']
         filename = secure_filename(file.filename)
-        movie.poster = filename
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-
-        movie.title = title
-        movie.genre = genre
-        movie.director = director
-        movie.released = released
-        movie.synopsis = synopsis
-        movie.rating = rating
-        movie.poster = filename
-
+        if file:
+            movie.poster = filename
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        movie.title = request.form['title']
+        movie.genre = request.form['genre']
+        movie.director = request.form['director']
+        movie.released = request.form['released']
+        movie.synopsis = request.form['synopsis']
+        movie.rating = request.form['rating']
         db.session.commit()
         flash('Your movie was updated successfully!')
         return redirect(url_for('moviepage', id=id))
@@ -194,34 +214,6 @@ def create():
 def display_image(filename):
     return redirect(url_for('static', filename='uploads/' + filename), code=301)
 
-
-# delete image from folder method
-# @app.route('/delete/<int:record_id>', methods=['POST'])
-# def delete_record(movie_id):
-#     # Find the record in the database and retrieve the associated image filename
-#     record = Movie.query.get(movie_id)
-#     if record is not None:
-#         filename = record.poster
-#
-#         # Delete the record from the database
-#         db.session.delete(record)
-#         db.session.commit()
-#
-#         # Remove the image file from the upload folder
-#         if filename:
-#             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-#             if os.path.exists(file_path):
-#                 os.remove(file_path)
-#                 flash('Image deleted successfully', 'success')
-#             else:
-#                 flash('Image file not found', 'error')
-#         else:
-#             flash('No image associated with the record', 'warning')
-#
-#         return redirect(url_for('movies_all'))
-#     else:
-#         flash('Record not found', 'error')
-#         return redirect(url_for('movies_all'))
 
 @app.route('/signup', methods=('POST', 'GET'))
 def signup():

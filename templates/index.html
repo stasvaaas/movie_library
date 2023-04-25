@@ -20,10 +20,10 @@
                     <a class="nav-link {% if request.path == '/movies' %} active {% endif %}" href="{{ url_for('movies_all') }}">Movies</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Genres</a>
+                    <a class="nav-link" href="{{ url_for('genres') }}">Genres</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Directors</a>
+                    <a class="nav-link" href="{{ url_for('directors') }}">Directors</a>
                 </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/create' %} active {% endif %}"  href="{{ url_for('create') }}">Add a movie</a>
@@ -43,7 +43,7 @@
                     </li>
                 {% else %}
                     <li class="nav-item {% if request.path == '/login' %} active {% endif %}">
-                        <a class="nav-link" href="login">Login</a>
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
                     </li>
                 {% endif %}
             </ul>
@@ -55,9 +55,11 @@
 
 <section class="py-5 text-center container">
     <div class="row py-lg-5">
-      <div class="col-lg-6 col-md-8 mx-auto">
-        <h1 class="fw-light">Album example</h1>
-        <p class="lead text-body-secondary">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
+      <div class="mx-auto">
+        <h1 class="fw-light">Welcome to our Movie Library!</h1>
+        <p class="lead">Discover and explore our collection of movies from various genres and directors.
+Navigate through our site and browse movies by genre, director, or search for specific titles. We hope you enjoy your time here and find your next favorite movie!
+Start exploring now and enjoy the magic of cinema!</p>
       </div>
     </div>
   </section>
