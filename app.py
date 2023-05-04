@@ -114,6 +114,7 @@ def movies_by_genre(genre):
 
 @app.route('/movies/<int:id>')
 def moviepage(id):
+
     movie = Movie.query.get(id)
     image_names = os.listdir('static/uploads')
     return render_template('movie.html', movie=movie, image_names=image_names)
@@ -157,6 +158,20 @@ def delete_movie(id):
         flash('Movie not found!', 'error')
 
     return redirect(url_for('movies_all'))
+
+
+@app.route('/filter_movies',  methods=['GET', 'POST'])
+def filter_movies():
+    image_names = os.listdir('static/uploads')
+    if request.method == 'POST':
+        start_date = datetime.strptime(request.form.get('start_date'), '%Y-%m-%d').date()
+        end_date = datetime.strptime(request.form.get('end_date'), '%Y-%m-%d').date()
+        movies = Movie.query.filter(Movie.released.between(start_date, end_date)).all()
+        return render_template('filtered_movies.html', movies=movies, image_names=image_names, start_date=start_date, end_date=end_date )
+
+    else:
+
+        return render_template('filtered_movies.html')
 
 
 def allowed_file(filename):
