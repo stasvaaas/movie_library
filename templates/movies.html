@@ -47,7 +47,7 @@
                                class="btn btn-sm btn-outline-secondary">View</a>
 
                             {% if current_user.username == movie.posted_by %}
-                            <a href="{{ url_for('moviepage', id=movie.movie_id) }}" type="button"
+                            <a href="{{ url_for('edit_movie', id=movie.movie_id) }}" type="button"
                                class="btn btn-sm btn-outline-secondary">Edit</a>
                             {% endif %}
                         </div>
