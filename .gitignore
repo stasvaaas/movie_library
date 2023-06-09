@@ -28,8 +28,9 @@ include/
 # Compiled Python files
 *.pyc
 
-# Generated files
-static/uploads/
+
 
 *.png
 *.jpg
+
+/static/uploads/
