@@ -8,6 +8,7 @@ db = "*"
 aiohttp = "*"
 delete = "*"
 edit = "*"
+app = "*"
 
 [dev-packages]
 
