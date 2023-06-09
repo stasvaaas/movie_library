@@ -1,30 +1,15 @@
 import os
-
-from flask_sqlalchemy import SQLAlchemy
 from waitress import serve
 from datetime import datetime
 from sqlalchemy import extract
-from flask_login import UserMixin, LoginManager
+from flask_login import UserMixin
 from sqlalchemy import Column, text
-# from config import app, db, login_manager, image_names
 from werkzeug.utils import secure_filename
-from flask import Markup, send_from_directory, jsonify, Flask
+from flask import Markup, send_from_directory, jsonify
 from flask import render_template, request, url_for, redirect, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, login_required, logout_user, login_user
 
-# UPLOAD_FOLDER = 'static/uploads'
-# app = Flask(__name__)
-# app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:new_password@localhost/movies_db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-# app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
-# db = SQLAlchemy(app)
-# login_manager = LoginManager()
-# login_manager.init_app(app)
-# login_manager.login_view = 'login'
 image_names = os.listdir('static/uploads')
 from config import db, login_manager, app
 
@@ -55,12 +40,6 @@ class Movie(db.Model):
 
     def __repr__(self):
         return f"<Movie id: {self.movie_id}>"
-
-# with app.app_context():
-#         db.drop_all()
-#
-# with app.app_context():
-#     db.create_all()
 
 
 @login_manager.user_loader

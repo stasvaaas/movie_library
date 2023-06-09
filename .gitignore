@@ -30,3 +30,6 @@ include/
 
 # Generated files
 static/uploads/
+
+*.png
+*.jpg
