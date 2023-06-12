@@ -9,9 +9,9 @@ from flask import Markup, send_from_directory, jsonify
 from flask import render_template, request, url_for, redirect, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, login_required, logout_user, login_user
+from config import db, login_manager, app
 
 image_names = os.listdir('static/uploads')
-from config import db, login_manager, app
 
 
 class User(UserMixin, db.Model):
@@ -57,7 +57,6 @@ def display_image(filename):
 
 @app.route('/')
 def home():
-    # flash('Your movie was added successfully!', category='success')
     return render_template('index.html', )
 
 
@@ -88,7 +87,6 @@ def filter_movies():
         movies = Movie.query.filter(Movie.released.between(start_date, end_date)).all()
         return render_template('filtered_movies.html', movies=movies, image_names=image_names, start_date=start_date,
                                end_date=end_date)
-
     else:
 
         return render_template('filtered_movies.html')
@@ -136,7 +134,6 @@ def delete_movie(id):
         flash('Movie deleted successfully!', 'success')
     else:
         flash('Movie not found!', 'error')
-
     return redirect(url_for('movies_all'))
 
 
@@ -292,7 +289,7 @@ def get_movies():
             'title': movie.title,
             'director': movie.director,
             'genre': movie.genre,
-            'released': movie.released
+            'released': movie.released.strftime('%Y-%m-%d')
         }
         movie_list.append(movie_data)
 
